@@ -123,6 +123,7 @@ nav.scrolled {
   color: var(--indigo-light);
   margin-bottom: 48px;
   max-width: 600px;
+  text-wrap: balance;
 }
 .hero-body {
   font-size: 17px; line-height: 1.7;
@@ -177,6 +178,7 @@ nav.scrolled {
   letter-spacing: -0.025em;
   margin-bottom: 80px;
   max-width: 720px;
+  text-wrap: balance;
 }
 .cap-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -256,6 +258,7 @@ nav.scrolled {
   color: var(--white);
   letter-spacing: -0.025em;
   margin-bottom: 40px;
+  text-wrap: balance;
 }
 .tension-body {
   font-size: 18px; line-height: 1.8;
@@ -320,29 +323,10 @@ nav.scrolled {
   overflow: hidden;
   background: var(--dark-mid);
 }
-/* FIX-05: Sophisticated gradient treatment */
-.case-hero-image::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(107,107,214,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 30%, rgba(190,81,3,0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(107,107,214,0.08) 0%, transparent 40%),
-    linear-gradient(135deg, #0d0d18 0%, #111122 40%, #16101a 100%);
-}
-/* Aicandia mark watermark at very low opacity */
+/* Video embed container — no overlays */
+.case-hero-image::before,
 .case-hero-image::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 260px; height: 210px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='50 70 100 90' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 60 150 L 85 80 L 110 150 Z'/%3E%3Cpath d='M 90 150 L 115 90 L 140 150 Z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.04;
-  pointer-events: none;
+  display: none;
 }
 .case-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
@@ -658,8 +642,8 @@ footer::before {
   </a>
   <div class="nav-links">
     <a href="#capabilities">Services</a>
-    <a href="#work">Work</a>
     <a href="#about">About</a>
+    <a href="#work">Work</a>
     <a href="#tool" class="nav-cta">Brand Builder</a>
   </div>
 </nav>
@@ -739,8 +723,13 @@ footer::before {
 <section class="case-study" id="work">
   <!-- FIX-03: label-light -> accent -->
   <div class="section-label label-indigo reveal">Featured Work</div>
-  <!-- FIX-05: Improved case study placeholder, bracket text removed -->
-  <div class="case-hero-image reveal"></div>
+  <!-- Vimeo embed: Genesis Room for Imagination -->
+  <div class="case-hero-image reveal" style="aspect-ratio:16/9;">
+    <div style="padding:56.25% 0 0 0;position:relative;width:100%;height:100%;">
+      <iframe src="https://player.vimeo.com/video/1118588362?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:6px;" title="Genesis Room for Imagination"></iframe>
+    </div>
+  </div>
+  <script src="https://player.vimeo.com/api/player.js"></script>
   <div class="case-grid">
     <div class="reveal">
       <h2 class="case-headline">Room for Imagination.</h2>
@@ -860,6 +849,7 @@ footer::before {
     </div>
     <div class="footer-nav">
       <a href="#capabilities">Services</a>
+      <a href="#about">About</a>
       <a href="#work">Work</a>
       <a href="#tool">Brand Builder</a>
       <a href="mailto:steven@aicandia.com">Let's talk</a>
