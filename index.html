@@ -267,6 +267,32 @@ nav.scrolled {
   font-weight: 300;
 }
 
+/* Tension two-column grid with particle canvas */
+.tension-inner {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.particle-col {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 560px;
+  justify-self: end;
+}
+#particle-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 8px;
+}
+
 /* ========== PROCESS ========== */
 .process {
   padding: 160px 60px 140px;
@@ -607,6 +633,8 @@ footer::before {
   .cap-grid { grid-template-columns: 1fr; gap: 40px; }
   .cap-item { padding: 24px; }
   .tension { padding: 120px 32px; }
+  .tension-inner { grid-template-columns: 1fr; gap: 48px; }
+  .particle-col { justify-self: center; max-width: 340px; }
   .process-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
   .case-study { padding: 120px 32px; }
   .case-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -685,9 +713,14 @@ footer::before {
 <!-- ==================== TENSION / ABOUT ==================== -->
 <!-- ELEVATE-07: id="about" added -->
 <section class="tension" id="about">
-  <div class="tension-content">
-    <h2 class="tension-headline reveal">Most marketing consultants hand you a deck and wish you luck.</h2>
-    <p class="tension-body reveal">We stay in the room. We do the thinking and the making. Twenty years at TBWA\Chiat\Day, Saatchi, and 72andSunny taught us one thing: strategy without execution is just dots on a page.</p>
+  <div class="tension-inner">
+    <div class="tension-content">
+      <h2 class="tension-headline reveal">Most marketing consultants hand you a deck and wish you luck.</h2>
+      <p class="tension-body reveal">We stay in the room. We do the thinking and the making. Twenty years at TBWA\Chiat\Day, Saatchi, and 72andSunny taught us one thing: strategy without execution is just dots on a page.</p>
+    </div>
+    <div class="particle-col">
+      <canvas id="particle-canvas"></canvas>
+    </div>
   </div>
 </section>
 
@@ -971,6 +1004,214 @@ animate();
   document.querySelectorAll('.reveal').forEach(function(el) {
     observer.observe(el);
   });
+})();
+</script>
+
+<!-- ==================== PARTICLE MARK (About Section 3D) ==================== -->
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.module.js';
+
+(function() {
+  const PARTICLE_COUNT = 400;
+  const POINTS_PER_TRIANGLE = 200;
+  const SPHERE_RADIUS = 3.0;
+  const LERP_DAMPING = 0.91;
+  const REPULSION_RADIUS = 0.8;
+  const REPULSION_STRENGTH = 0.06;
+  const TURBULENCE_AMPLITUDE = 0.012;
+  const COLOR_INDIGO = new THREE.Color('#6B6BD6');
+  const COLOR_ORANGE = new THREE.Color('#BE5103');
+  const COLOR_MUTED = new THREE.Color('#3a3a5a');
+
+  const LEFT_TRI = { apex: [-0.35, 1.0], baseL: [-1.0, -0.8], baseR: [0.2, -0.8] };
+  const RIGHT_TRI = { apex: [0.35, 0.55], baseL: [-0.1, -0.8], baseR: [1.0, -0.8] };
+
+  function sampleTriangle(tri, count) {
+    const points = [];
+    const [ax, ay] = tri.apex;
+    const [bx, by] = tri.baseL;
+    const [cx, cy] = tri.baseR;
+    for (let i = 0; i < count; i++) {
+      let r1 = Math.random(), r2 = Math.random();
+      if (r1 + r2 > 1) { r1 = 1 - r1; r2 = 1 - r2; }
+      const r3 = 1 - r1 - r2;
+      points.push([r1 * ax + r2 * bx + r3 * cx, r1 * ay + r2 * by + r3 * cy, 0]);
+    }
+    return points;
+  }
+
+  const allTargets = [...sampleTriangle(LEFT_TRI, POINTS_PER_TRIANGLE), ...sampleTriangle(RIGHT_TRI, POINTS_PER_TRIANGLE)];
+
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+
+  let rendererReady = false;
+  let pcRenderer, pcScene, pcCamera;
+  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const colors = new Float32Array(PARTICLE_COUNT * 3);
+  const targetPositions = new Float32Array(PARTICLE_COUNT * 3);
+  const velocities = Array.from({ length: PARTICLE_COUNT }, () => new THREE.Vector3());
+  const tPhase = new Float32Array(PARTICLE_COUNT);
+  const tFreq = new Float32Array(PARTICLE_COUNT);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    tPhase[i] = Math.random() * Math.PI * 2;
+    tFreq[i] = 0.4 + Math.random() * 0.6;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = SPHERE_RADIUS * Math.cbrt(Math.random());
+    positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = r * Math.cos(phi);
+    targetPositions[i * 3] = allTargets[i][0];
+    targetPositions[i * 3 + 1] = allTargets[i][1];
+    targetPositions[i * 3 + 2] = allTargets[i][2];
+    colors[i * 3] = COLOR_MUTED.r;
+    colors[i * 3 + 1] = COLOR_MUTED.g;
+    colors[i * 3 + 2] = COLOR_MUTED.b;
+  }
+
+  let geometry, points;
+  let formed = false, formProgress = 0, formStartTime = null;
+  const FORM_DURATION = 2000;
+  const mouse = new THREE.Vector2(-9999, -9999);
+  const raycaster = new THREE.Raycaster();
+  const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  const mouseWorld = new THREE.Vector3();
+  const tempColor = new THREE.Color();
+
+  function initRenderer() {
+    if (rendererReady) return;
+    rendererReady = true;
+
+    pcRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    pcRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    pcRenderer.setClearColor(0x000000, 0);
+
+    pcScene = new THREE.Scene();
+    pcCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    pcCamera.position.set(0, 0, 4.5);
+
+    geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 0.045, vertexColors: true, transparent: true,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+    });
+
+    points = new THREE.Points(geometry, material);
+    pcScene.add(points);
+    resize();
+    requestAnimationFrame(animate);
+  }
+
+  function resize() {
+    if (!rendererReady) return;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    pcRenderer.setSize(w, h, false);
+    pcCamera.aspect = w / h;
+    pcCamera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+
+  // Gate renderer behind IntersectionObserver
+  const aboutSection = document.getElementById('about');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        initRenderer();
+        if (!formed) {
+          formed = true;
+          formStartTime = performance.now();
+        }
+      }
+    });
+  }, { threshold: 0.25 });
+  observer.observe(aboutSection);
+
+  // Mouse tracking
+  window.addEventListener('mousemove', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    } else {
+      mouse.set(-9999, -9999);
+    }
+  });
+  canvas.addEventListener('mouseleave', function() { mouse.set(-9999, -9999); });
+
+  function animate(now) {
+    if (!rendererReady) return;
+    requestAnimationFrame(animate);
+
+    if (formed && formProgress < 1) {
+      formProgress = Math.min((now - formStartTime) / FORM_DURATION, 1);
+    }
+    const t = formProgress * formProgress * (3 - 2 * formProgress);
+
+    const rotationStrength = Math.max(0, 1 - t * 1.5);
+    points.rotation.y += 0.003 * rotationStrength;
+    points.rotation.x += 0.0008 * rotationStrength;
+
+    raycaster.setFromCamera(mouse, pcCamera);
+    const hitPlane = raycaster.ray.intersectPlane(plane, mouseWorld);
+    const mouseLocal = new THREE.Vector3();
+    if (hitPlane) points.worldToLocal(mouseLocal.copy(mouseWorld));
+
+    const posAttr = geometry.attributes.position;
+    const colAttr = geometry.attributes.color;
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const ix = i * 3;
+      const cx = posAttr.array[ix], cy = posAttr.array[ix + 1], cz = posAttr.array[ix + 2];
+      const tx = targetPositions[ix], ty = targetPositions[ix + 1], tz = targetPositions[ix + 2];
+
+      const turbTime = now * 0.001 * tFreq[i] + tPhase[i];
+      const turbX = Math.sin(turbTime * 1.3) * TURBULENCE_AMPLITUDE;
+      const turbY = Math.cos(turbTime * 0.9) * TURBULENCE_AMPLITUDE;
+      const turbZ = Math.sin(turbTime * 1.1 + 1.0) * TURBULENCE_AMPLITUDE * 0.5;
+
+      const springK = 0.04 * t;
+      velocities[i].x += ((tx + turbX) - cx) * springK;
+      velocities[i].y += ((ty + turbY) - cy) * springK;
+      velocities[i].z += ((tz + turbZ) - cz) * springK;
+
+      if (t < 0.01) {
+        velocities[i].x += (Math.random() - 0.5) * 0.001;
+        velocities[i].y += (Math.random() - 0.5) * 0.001;
+      }
+
+      if (hitPlane) {
+        const mdx = cx - mouseLocal.x, mdy = cy - mouseLocal.y, mdz = cz - mouseLocal.z;
+        const distSq = mdx * mdx + mdy * mdy + mdz * mdz;
+        if (distSq < REPULSION_RADIUS * REPULSION_RADIUS && distSq > 0.0001) {
+          const dist = Math.sqrt(distSq);
+          const force = REPULSION_STRENGTH * (1 - dist / REPULSION_RADIUS);
+          velocities[i].x += (mdx / dist) * force;
+          velocities[i].y += (mdy / dist) * force;
+          velocities[i].z += (mdz / dist) * force;
+        }
+      }
+
+      velocities[i].multiplyScalar(LERP_DAMPING);
+      posAttr.array[ix] = cx + velocities[i].x;
+      posAttr.array[ix + 1] = cy + velocities[i].y;
+      posAttr.array[ix + 2] = cz + velocities[i].z;
+
+      const targetColor = i < POINTS_PER_TRIANGLE ? COLOR_INDIGO : COLOR_ORANGE;
+      tempColor.lerpColors(COLOR_MUTED, targetColor, t);
+      colAttr.array[ix] = tempColor.r;
+      colAttr.array[ix + 1] = tempColor.g;
+      colAttr.array[ix + 2] = tempColor.b;
+    }
+
+    posAttr.needsUpdate = true;
+    colAttr.needsUpdate = true;
+    pcRenderer.render(pcScene, pcCamera);
+  }
 })();
 </script>
 
