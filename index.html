@@ -84,6 +84,7 @@ nav.scrolled {
   opacity: 1;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 20px;
+  min-height: 48px;
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 4px;
   transition: all 0.3s;
@@ -648,11 +649,199 @@ footer::before {
 @media (max-width: 640px) {
   .process-grid { grid-template-columns: 1fr; }
   .case-stats { flex-direction: column; gap: 24px; }
-  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links a:not(.nav-cta):not(.nav-hamburger) { display: none; }
   .hero-scroll { display: none; }
   .nav-links { gap: 20px; }
   .logos-row { gap: 32px; }
-  .footer-nav { display: none; }
+  /* Keep footer nav visible on mobile */
+  .footer-nav { display: flex; flex-wrap: wrap; gap: 16px; }
+  /* Vimeo embed: 16:9 on mobile */
+  .case-hero-image { aspect-ratio: 16 / 9 !important; }
+}
+@media (max-width: 480px) {
+  nav { padding: 20px 16px; }
+  .hero { padding: 0 16px 60px; }
+  .capabilities, .process { padding: 80px 16px 60px; }
+  .tension { padding: 80px 16px; }
+  .case-study { padding: 80px 16px; }
+  .headlines { padding: 60px 16px; }
+  .tool-cta { padding: 80px 16px; }
+  .logos { padding: 40px 16px; }
+  footer { padding: 40px 16px 24px; }
+}
+
+/* ========== HAMBURGER MENU ========== */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 48px;
+  height: 48px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.06); }
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
+}
+.nav-hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  .nav-hamburger { display: flex; }
+  .nav-links a.nav-cta { display: none; }
+}
+
+/* ========== MOBILE MENU OVERLAY ========== */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1001;
+  background: var(--dark-mid);
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mobile-menu.is-open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+.mobile-menu-close {
+  position: absolute;
+  top: 24px; right: 20px;
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.5);
+  font-size: 28px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+.mobile-menu-close:hover {
+  color: var(--white);
+  background: rgba(255,255,255,0.06);
+}
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 80px 32px 0;
+}
+.mobile-menu-nav a {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Source Serif 4', serif;
+  font-size: clamp(28px, 7vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255,255,255,0.7);
+  padding: 14px 24px;
+  border-radius: 6px;
+  transition: color 0.25s, background 0.25s;
+}
+.mobile-menu-nav a:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+.mobile-menu-divider {
+  width: 40px; height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 16px auto;
+}
+.mobile-menu-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white) !important;
+  background: var(--accent);
+  padding: 18px 24px;
+  border-radius: 6px;
+  transition: background 0.25s;
+  margin-top: 8px;
+}
+.mobile-menu-cta:hover { background: var(--accent-light) !important; }
+
+/* ========== STICKY BOTTOM CTA (mobile only) ========== */
+.sticky-cta {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 500;
+  height: 56px;
+  background: var(--accent);
+  align-items: center;
+  justify-content: center;
+}
+.sticky-cta a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.sticky-cta.is-visible { display: flex; }
+
+@media (min-width: 769px) {
+  .sticky-cta { display: none !important; }
+  .mobile-menu { display: none !important; }
+  .nav-hamburger { display: none !important; }
+}
+
+/* Add bottom padding to footer on mobile to clear sticky CTA */
+@media (max-width: 768px) {
+  footer { padding-bottom: 72px; }
+}
+
+/* ========== PREFERS-REDUCED-MOTION ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 </style>
 </head>
@@ -673,8 +862,31 @@ footer::before {
     <a href="#about">About</a>
     <a href="#work">Work</a>
     <a href="#tool" class="nav-cta">Brand Builder</a>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </nav>
+
+<!-- ==================== MOBILE MENU ==================== -->
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">&times;</button>
+  <nav class="mobile-menu-nav">
+    <a href="#capabilities" class="mobile-menu-link">Services</a>
+    <a href="#about" class="mobile-menu-link">About</a>
+    <a href="#work" class="mobile-menu-link">Work</a>
+    <a href="#tool" class="mobile-menu-link">Brand Builder</a>
+    <div class="mobile-menu-divider"></div>
+    <a href="mailto:steven@aicandia.com" class="mobile-menu-cta">Get in Touch</a>
+  </nav>
+</div>
+
+<!-- ==================== STICKY CTA (mobile) ==================== -->
+<div class="sticky-cta" id="sticky-cta" aria-hidden="true">
+  <a href="mailto:steven@aicandia.com">Get in Touch</a>
+</div>
 
 <!-- ==================== HERO ==================== -->
 <section class="hero">
@@ -893,6 +1105,95 @@ footer::before {
     <span>Los Angeles, CA</span>
   </div>
 </footer>
+
+<!-- ==================== MOBILE MENU + STICKY CTA JS ==================== -->
+<script>
+(function() {
+  var hamburger = document.getElementById('nav-hamburger');
+  var mobileMenu = document.getElementById('mobile-menu');
+  var closeBtn = document.getElementById('mobile-menu-close');
+  var stickyCta = document.getElementById('sticky-cta');
+  var hero = document.querySelector('.hero');
+
+  function openMenu() {
+    mobileMenu.classList.add('is-open');
+    hamburger.classList.add('is-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove('is-open');
+    hamburger.classList.remove('is-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', function() {
+    if (mobileMenu.classList.contains('is-open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  closeBtn.addEventListener('click', closeMenu);
+
+  // Close menu when any nav link is tapped
+  mobileMenu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      closeMenu();
+    });
+  });
+
+  // Close menu on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) {
+      closeMenu();
+    }
+  });
+
+  // Sticky CTA: show after scrolling past hero section
+  if (stickyCta && hero) {
+    var heroBottom = 0;
+
+    function updateHeroBottom() {
+      heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
+    }
+    updateHeroBottom();
+    window.addEventListener('resize', updateHeroBottom, { passive: true });
+
+    // Hide sticky CTA when footer is in view to avoid overlap
+    var footer = document.querySelector('footer');
+
+    function onScroll() {
+      var scrollY = window.scrollY;
+      var viewportHeight = window.innerHeight;
+
+      // Show after scrolling past hero
+      var pastHero = scrollY > heroBottom - viewportHeight;
+
+      // Hide when footer is visible
+      var footerVisible = false;
+      if (footer) {
+        var footerTop = footer.getBoundingClientRect().top;
+        footerVisible = footerTop < viewportHeight;
+      }
+
+      if (pastHero && !footerVisible) {
+        stickyCta.classList.add('is-visible');
+        stickyCta.setAttribute('aria-hidden', 'false');
+      } else {
+        stickyCta.classList.remove('is-visible');
+        stickyCta.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+})();
+</script>
 
 <!-- ==================== THREE.JS HERO ==================== -->
 <script type="module">
