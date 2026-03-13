@@ -678,12 +678,25 @@ footer::before {
     right: 32px;
     z-index: 1002;
   }
+
+  /* Float logo independently above all sections */
+  .nav-logo {
+    position: fixed;
+    top: 16px;
+    left: 32px;
+    z-index: 1002;
+    transition: color 0.3s ease;
+  }
 }
 
 @media (max-width: 480px) {
   .nav-hamburger {
     top: 12px;
     right: 16px;
+  }
+  .nav-logo {
+    top: 12px;
+    left: 16px;
   }
 }
 
@@ -693,6 +706,11 @@ footer::before {
 }
 .nav-hamburger.on-light:hover {
   background: rgba(0, 0, 0, 0.06);
+}
+
+/* Logo adapts to light sections */
+.nav-logo.on-light {
+  color: var(--ink);
 }
 
 /* ========== MOBILE MENU OVERLAY ========== */
@@ -1269,6 +1287,7 @@ animate();
   var mq = window.matchMedia('(max-width: 768px)');
 
   var hamburger = document.getElementById('nav-hamburger');
+  var navLogo = document.querySelector('.nav-logo');
   if (!hamburger) return;
 
   // Sections and whether they are "light" (linen) backgrounds
@@ -1287,42 +1306,58 @@ animate();
     return { el: document.querySelector(s.selector), light: s.light };
   }).filter(function(s) { return s.el !== null; });
 
-  function updateHamburgerColor() {
+  function getIsLight(centerY) {
+    for (var i = 0; i < sections.length; i++) {
+      var rect = sections[i].el.getBoundingClientRect();
+      if (centerY >= rect.top && centerY < rect.bottom) {
+        return sections[i].light;
+      }
+    }
+    return false;
+  }
+
+  function updateNavColors() {
     if (!mq.matches) {
       // Desktop: always remove on-light, let desktop styles handle everything
       hamburger.classList.remove('on-light');
+      if (navLogo) navLogo.classList.remove('on-light');
       return;
     }
 
-    // If menu is open, hamburger sits on the dark overlay — keep white
+    // If menu is open, both sit on the dark overlay — keep white
     if (hamburger.classList.contains('is-open')) {
       hamburger.classList.remove('on-light');
+      if (navLogo) navLogo.classList.remove('on-light');
       return;
     }
 
     // Hamburger is fixed; check which section its vertical centre overlaps
     var hamburgerCenterY = hamburger.getBoundingClientRect().top + 24;
+    var hamburgerLight = getIsLight(hamburgerCenterY);
 
-    var isLight = false;
-    for (var i = 0; i < sections.length; i++) {
-      var rect = sections[i].el.getBoundingClientRect();
-      if (hamburgerCenterY >= rect.top && hamburgerCenterY < rect.bottom) {
-        isLight = sections[i].light;
-        break;
-      }
-    }
-
-    if (isLight) {
+    if (hamburgerLight) {
       hamburger.classList.add('on-light');
     } else {
       hamburger.classList.remove('on-light');
     }
+
+    // Logo uses the same logic with its own vertical position
+    if (navLogo) {
+      var logoCenterY = navLogo.getBoundingClientRect().top + navLogo.getBoundingClientRect().height / 2;
+      var logoLight = getIsLight(logoCenterY);
+
+      if (logoLight) {
+        navLogo.classList.add('on-light');
+      } else {
+        navLogo.classList.remove('on-light');
+      }
+    }
   }
 
-  window.addEventListener('scroll', updateHamburgerColor, { passive: true });
-  window.addEventListener('resize', updateHamburgerColor, { passive: true });
-  mq.addEventListener('change', updateHamburgerColor);
-  updateHamburgerColor();
+  window.addEventListener('scroll', updateNavColors, { passive: true });
+  window.addEventListener('resize', updateNavColors, { passive: true });
+  mq.addEventListener('change', updateNavColors);
+  updateNavColors();
 })();
 </script>
 
