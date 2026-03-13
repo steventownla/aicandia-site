@@ -157,12 +157,6 @@ nav.scrolled {
 .hero-content > *:nth-child(2) { animation-delay: 0.6s; }
 .hero-content > *:nth-child(3) { animation-delay: 0.8s; }
 
-/* ========== CAPABILITIES ========== */
-.capabilities {
-  padding: 160px 60px 140px;
-  background: var(--linen);
-  position: relative;
-}
 .section-label {
   font-family: 'DM Sans', sans-serif;
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
@@ -181,41 +175,6 @@ nav.scrolled {
   max-width: 720px;
   text-wrap: balance;
 }
-.cap-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 64px;
-}
-
-/* ELEVATE-01: Capability card hover states */
-.cap-item {
-  padding: 32px;
-  border-radius: 6px;
-  transition: background 0.4s ease, transform 0.3s ease;
-}
-.cap-item:hover {
-  background: rgba(190, 81, 3, 0.03);
-  transform: translateY(-4px);
-}
-.cap-rule {
-  width: 32px; height: 2px;
-  background: var(--accent);
-  margin-bottom: 20px;
-  transition: width 0.4s ease;
-}
-.cap-item:hover .cap-rule {
-  width: 52px;
-}
-.cap-title {
-  font-family: 'Source Serif 4', serif;
-  font-size: 26px; font-weight: 700;
-  margin-bottom: 20px; line-height: 1.15;
-  color: var(--ink);
-}
-.cap-desc {
-  font-size: 15px; line-height: 1.75;
-  color: var(--ink-light); font-weight: 300;
-}
-
 /* ========== TENSION ========== */
 @keyframes ambientDrift {
   0%, 100% { transform: translate(0, 0); }
@@ -297,10 +256,10 @@ nav.scrolled {
 /* ========== PROCESS ========== */
 .process {
   padding: 160px 60px 140px;
-  background: var(--linen-cool);
+  background: var(--linen);
 }
 .process-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(3, 1fr);
   gap: 48px;
 }
 
@@ -630,9 +589,7 @@ footer::before {
 @media (max-width: 1024px) {
   nav { padding: 24px 32px; }
   .hero { padding: 0 32px 60px; }
-  .capabilities, .process { padding: 120px 32px 100px; }
-  .cap-grid { grid-template-columns: 1fr; gap: 40px; }
-  .cap-item { padding: 24px; }
+  .process { padding: 120px 32px 100px; }
   .tension { padding: 120px 32px; }
   .tension-inner { grid-template-columns: 1fr; gap: 48px; }
   .particle-col { justify-self: center; max-width: 340px; }
@@ -661,7 +618,7 @@ footer::before {
 @media (max-width: 480px) {
   nav { padding: 20px 16px; }
   .hero { padding: 0 16px 60px; }
-  .capabilities, .process { padding: 80px 16px 60px; }
+  .process { padding: 80px 16px 60px; }
   .tension { padding: 80px 16px; }
   .case-study { padding: 80px 16px; }
   .headlines { padding: 60px 16px; }
@@ -704,6 +661,38 @@ footer::before {
 @media (max-width: 768px) {
   .nav-hamburger { display: flex; }
   .nav-links a.nav-cta { display: none; }
+
+  /* Transparent nav on mobile — no dark background ever */
+  nav,
+  nav.scrolled {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: none !important;
+  }
+
+  /* Float hamburger independently above all sections */
+  .nav-hamburger {
+    position: fixed;
+    top: 16px;
+    right: 32px;
+    z-index: 1002;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-hamburger {
+    top: 12px;
+    right: 16px;
+  }
+}
+
+/* Hamburger lines adapt to light sections */
+.nav-hamburger.on-light span {
+  background: var(--ink);
+}
+.nav-hamburger.on-light:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 /* ========== MOBILE MENU OVERLAY ========== */
@@ -858,7 +847,7 @@ footer::before {
     <span>Aicandia</span>
   </a>
   <div class="nav-links">
-    <a href="#capabilities">Services</a>
+    <a href="#process">Services</a>
     <a href="#about">About</a>
     <a href="#work">Work</a>
     <a href="#tool" class="nav-cta">Brand Builder</a>
@@ -874,7 +863,7 @@ footer::before {
 <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
   <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">&times;</button>
   <nav class="mobile-menu-nav">
-    <a href="#capabilities" class="mobile-menu-link">Services</a>
+    <a href="#process" class="mobile-menu-link">Services</a>
     <a href="#about" class="mobile-menu-link">About</a>
     <a href="#work" class="mobile-menu-link">Work</a>
     <a href="#tool" class="mobile-menu-link">Brand Builder</a>
@@ -893,31 +882,41 @@ footer::before {
   <div id="hero-canvas"></div>
   <div class="hero-content">
     <h1 class="hero-headline">Machine speed.<br>Human craft.</h1>
-    <p class="hero-subline">AI can make a thousand versions. It can't pick the right one.</p>
-    <p class="hero-body">Senior creative leadership, embedded in your business. We set the strategy and make the work, using AI agents that move faster than any agency team. No overhead. Just results.</p>
+    <p class="hero-subline">AI can make a thousand versions.<br>You need a human to pick the right one.</p>
+    <p class="hero-body">Senior creative leadership, embedded in your business. We listen to your business problem, develop a plan, and use AI agents that move faster than any human team alone. We stay with you to measure&nbsp;results.</p>
   </div>
   <div class="hero-scroll">Scroll</div>
 </section>
 
-<!-- ==================== CAPABILITIES ==================== -->
-<section class="capabilities" id="capabilities">
-  <div class="section-label label-orange reveal">What we do</div>
-  <h2 class="section-headline reveal" style="color:var(--ink)">Leadership that thinks and makes.</h2>
-  <div class="cap-grid">
-    <div class="cap-item reveal">
-      <h3 class="cap-title">Brand Strategy &amp; Positioning</h3>
-      <div class="cap-rule"></div>
-      <p class="cap-desc">We build the positioning, messaging, and brand voice that everything else stands on. Who you are, what you stand for, how to say it so people remember it.</p>
+<!-- ==================== PROCESS ==================== -->
+<section class="process" id="process">
+  <div class="section-label label-orange reveal">How we work</div>
+  <h2 class="section-headline reveal" style="color:var(--ink)">We listen to your problems. Then we fix them.</h2>
+  <div class="process-grid">
+    <div class="process-step reveal">
+      <div class="process-number">01</div>
+      <div class="process-title">Lean in and listen</div>
+      <p class="process-desc">We sit down and talk through what's broken, what's working, and the targets you need to hit. Let's make your job easier.</p>
     </div>
-    <div class="cap-item reveal">
-      <h3 class="cap-title">Marketing Direction &amp; Planning</h3>
-      <div class="cap-rule"></div>
-      <p class="cap-desc">Strategy tied to business goals. Channel mix, campaign planning, and budget guidance from someone who's worked with global brands with massive budgets and tech startups with minimal marketing spend.</p>
+    <div class="process-step reveal">
+      <div class="process-number">02</div>
+      <div class="process-title">Build the plan</div>
+      <p class="process-desc">Strategy, creative territory, channel mix. Built to solve the specific problem we just heard. In days, not weeks. The planning is fast because the listening was thorough.</p>
     </div>
-    <div class="cap-item reveal">
-      <h3 class="cap-title">Creative Direction &amp; Production</h3>
-      <div class="cap-rule"></div>
-      <p class="cap-desc">We concept and produce. Campaigns and finished assets created with powerful AI integration all the way through and human approval before anything ships. That's machine speed and human craft.</p>
+    <div class="process-step reveal">
+      <div class="process-number">03</div>
+      <div class="process-title">Execute with agentic AI</div>
+      <p class="process-desc">You already know what these models can do. We pick whatever gets the work done fastest — open-source, proprietary, purpose-built. A senior creative director approves everything before it ships. Speed without the slop.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="process-number">04</div>
+      <div class="process-title">Scale when the moment calls for it</div>
+      <p class="process-desc">Super Bowl spot. Major brand launch. When the stakes go up, so do we. We've been in that room. We work with the world's best directors and act as your liaison with their production companies. Big moments need the right person. We're that person.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="process-number">05</div>
+      <div class="process-title">Stay in the room</div>
+      <p class="process-desc">We stay embedded, making sure the plan actually gets executed. Ongoing creative leadership at a fraction of the cost of a full agency retainer.</p>
     </div>
   </div>
 </section>
@@ -927,39 +926,11 @@ footer::before {
 <section class="tension" id="about">
   <div class="tension-inner">
     <div class="tension-content">
-      <h2 class="tension-headline reveal">Most marketing consultants hand you a deck and wish you luck.</h2>
-      <p class="tension-body reveal">We stay in the room. We do the thinking and the making. Twenty years at TBWA\Chiat\Day, Saatchi, and 72andSunny taught us one thing: strategy without execution is just dots on a page.</p>
+      <h2 class="tension-headline reveal">We stay in the room until the work is done.</h2>
+      <p class="tension-body reveal">We stay in the room. We do the thinking and the making. Twenty years at TBWA\Chiat\Day, Saatchi, and 72andSunny taught us one thing: great results come from partnering with clients.</p>
     </div>
     <div class="particle-col">
       <canvas id="particle-canvas"></canvas>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== PROCESS ==================== -->
-<section class="process" id="process">
-  <div class="section-label reveal" style="color:var(--indigo)">How we work</div>
-  <h2 class="section-headline reveal" style="color:var(--ink)">Embedded with your team. Moving at your speed.</h2>
-  <div class="process-grid">
-    <div class="process-step reveal">
-      <div class="process-number">01</div>
-      <div class="process-title">Listen &amp; Learn</div>
-      <p class="process-desc">We get into your business, your audience, your competitive reality. A properly understood problem is most of the solution.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="process-number">02</div>
-      <div class="process-title">Set the Direction</div>
-      <p class="process-desc">We define the brand position, the messaging, the creative territory. This is where judgment matters more than process.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="process-number">03</div>
-      <div class="process-title">Create at Speed</div>
-      <p class="process-desc">Direction locked, we produce. Campaigns and assets briefed in the morning, delivered the same day. A creative director calls every shot.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="process-number">04</div>
-      <div class="process-title">Refine &amp; Deliver</div>
-      <p class="process-desc">Everything gets approved by a human with senior Creative credentials before it ships. The machines have the speed. We have the taste.</p>
     </div>
   </div>
 </section>
@@ -978,7 +949,7 @@ footer::before {
   <div class="case-grid">
     <div class="reveal">
       <h2 class="case-headline">Room for Imagination.</h2>
-      <p class="case-body">The brief: tell the world about a family SUV with a disappearing third row. The insight: when you give kids space, they fill it imagination. We took it from creative territory to a broadcast script that aired at the World Series and the Grammys.</p>
+      <p class="case-body">The brief: tell the world about a family SUV with a disappearing third row. The insight: when you give kids space, they fill it imagination. We took it from creative territory to a broadcast script that aired at the World Series and the&nbsp;Grammys.</p>
       <div class="case-stats">
         <div>
           <div class="stat-number">2</div>
@@ -1093,7 +1064,7 @@ footer::before {
       <p class="footer-tagline">Get to Great Faster.</p>
     </div>
     <div class="footer-nav">
-      <a href="#capabilities">Services</a>
+      <a href="#process">Services</a>
       <a href="#about">About</a>
       <a href="#work">Work</a>
       <a href="#tool">Brand Builder</a>
@@ -1288,6 +1259,71 @@ animate();
       nav.classList.remove('scrolled');
     }
   }, { passive: true });
+})();
+</script>
+
+<!-- ==================== HAMBURGER COLOR ADAPTATION (mobile) ==================== -->
+<script>
+(function() {
+  // Only active on mobile viewports
+  var mq = window.matchMedia('(max-width: 768px)');
+
+  var hamburger = document.getElementById('nav-hamburger');
+  if (!hamburger) return;
+
+  // Sections and whether they are "light" (linen) backgrounds
+  var sectionMap = [
+    { selector: '.hero',         light: false },
+    { selector: '.capabilities', light: true  },
+    { selector: '.tension',      light: false },
+    { selector: '.process',      light: true  },
+    { selector: '.case-study',   light: false },
+    { selector: '.headlines',    light: true  },
+    { selector: '.tool-cta',     light: false },
+    { selector: '.logos',        light: true  },
+    { selector: 'footer',        light: false }
+  ];
+
+  var sections = sectionMap.map(function(s) {
+    return { el: document.querySelector(s.selector), light: s.light };
+  }).filter(function(s) { return s.el !== null; });
+
+  function updateHamburgerColor() {
+    if (!mq.matches) {
+      // Desktop: always remove on-light, let desktop styles handle everything
+      hamburger.classList.remove('on-light');
+      return;
+    }
+
+    // If menu is open, hamburger sits on the dark overlay — keep white
+    if (hamburger.classList.contains('is-open')) {
+      hamburger.classList.remove('on-light');
+      return;
+    }
+
+    // Hamburger is fixed; check which section its vertical centre overlaps
+    var hamburgerCenterY = hamburger.getBoundingClientRect().top + 24;
+
+    var isLight = false;
+    for (var i = 0; i < sections.length; i++) {
+      var rect = sections[i].el.getBoundingClientRect();
+      if (hamburgerCenterY >= rect.top && hamburgerCenterY < rect.bottom) {
+        isLight = sections[i].light;
+        break;
+      }
+    }
+
+    if (isLight) {
+      hamburger.classList.add('on-light');
+    } else {
+      hamburger.classList.remove('on-light');
+    }
+  }
+
+  window.addEventListener('scroll', updateHamburgerColor, { passive: true });
+  window.addEventListener('resize', updateHamburgerColor, { passive: true });
+  mq.addEventListener('change', updateHamburgerColor);
+  updateHamburgerColor();
 })();
 </script>
 
